@@ -513,7 +513,7 @@ static bool IsEventPacketDataValid(
     // Always ensure that the packet does not contain any invalid item
     // objects, as this can cause a buffer overflow to occur.
     if (eventPacket->containsInvalidItemObject()) {
-        return false;
+        return true;
     }
 
     if (!NetController::Instance()->inVanillaMatch()) {
@@ -521,7 +521,7 @@ static bool IsEventPacketDataValid(
     }
 
     if (!eventPacket->isValid(packetSize)) {
-        return false;
+        return true;
     }
 
     return true;

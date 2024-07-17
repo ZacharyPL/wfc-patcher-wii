@@ -92,7 +92,7 @@ public:
     private:
         static const u16 s_maxMiis = 2;
         static const u16 s_minRating = 1;
-        static const u16 s_maxRating = 9999;
+        static const u16 s_maxRating = 30000;
     };
 
     static_assert(sizeof(Packet) == 0xC0);
