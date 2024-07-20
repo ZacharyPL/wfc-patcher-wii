@@ -124,7 +124,7 @@ WWFC_DEFINE_PATCH = {
 // Allow users to open rooms without having any friends added
 WWFC_DEFINE_PATCH = {
     Patch::CallWithCTR( //
-        WWFC_PATCH_LEVEL_FEATURE, //
+        WWFC_PATCH_LEVEL_SUPPORT, //
         RMCXD_PORT(0x8064D358, 0x8061A044, 0x8064C9C4, 0x8063B670), //
         // clang-format off
         [](mkw::UI::WifiFriendMenuPage* /* wifiFriendMenuPage */, void* /* pushButton */) -> int {
@@ -199,42 +199,42 @@ WWFC_DEFINE_PATCH = {
 // Allow the "Open Host" feature to be enabled via the press of a button
 WWFC_DEFINE_PATCH = {
     Patch::WritePointer(
-        WWFC_PATCH_LEVEL_FEATURE,
+        WWFC_PATCH_LEVEL_SUPPORT,
         RMCXD_PORT(0x808B9008, 0x808BABF8, 0x808B8158, 0x808A7470), //
         FriendRoomPage_onActivate
     ),
 };
 WWFC_DEFINE_PATCH = {
     Patch::WritePointer(
-        WWFC_PATCH_LEVEL_FEATURE,
+        WWFC_PATCH_LEVEL_SUPPORT,
         RMCXD_PORT(0x808B900C, 0x808BABFC, 0x808B815C, 0x808A7474), //
         FriendRoomPage_onDeactivate
     ),
 };
 WWFC_DEFINE_PATCH = {
     Patch::WritePointer(
-        WWFC_PATCH_LEVEL_FEATURE,
+        WWFC_PATCH_LEVEL_SUPPORT,
         RMCXD_PORT(0x808B902C, 0x808BAC1C, 0x808B817C, 0x808A7494), //
         FriendRoomPage_onRefocus
     ),
 };
 WWFC_DEFINE_PATCH = {
     Patch::WritePointer(
-        WWFC_PATCH_LEVEL_FEATURE,
+        WWFC_PATCH_LEVEL_SUPPORT,
         RMCXD_PORT(0x808BFE7C, 0x808B97CC, 0x808BEFCC, 0x808AE2EC), //
         WifiFriendMenu_onActivate
     ),
 };
 WWFC_DEFINE_PATCH = {
     Patch::WritePointer(
-        WWFC_PATCH_LEVEL_FEATURE,
+        WWFC_PATCH_LEVEL_SUPPORT,
         RMCXD_PORT(0x808BFE80, 0x808B97D0, 0x808BEFD0, 0x808AE2F0), //
         WifiFriendMenu_onDeactivate
     ),
 };
 WWFC_DEFINE_PATCH = {
     Patch::WritePointer(
-        WWFC_PATCH_LEVEL_FEATURE,
+        WWFC_PATCH_LEVEL_SUPPORT,
         RMCXD_PORT(0x808BFEA0, 0x808B97F0, 0x808BEFF0, 0x808AE310), //
         WifiFriendMenu_onRefocus
     ),
