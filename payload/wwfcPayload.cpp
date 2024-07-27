@@ -145,6 +145,13 @@ s32 EntryAfterGOT(wwfc_payload* payload)
 
     EGG::Exception::SetUserCallBack(nullptr);
 
+    // "Anticheat"
+    // Check for the presence of the gecko codehandler, and halt online connections if it is found
+    if (*(u8 *)0x800018A8 = 0x94)
+    {
+        return WL_ERROR_PAYLOAD_STAGE1_WAITING;
+    }
+
     CallCtors(payload);
 
     Patch::ApplyPatchList(

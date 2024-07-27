@@ -13,9 +13,9 @@
 #ifndef WWFC_DOMAIN
 
 #  ifdef PROD
-#    define WWFC_DOMAIN "wiilink24.com"
+#    define WWFC_DOMAIN "zplwii.xyz"
 #  else
-#    define WWFC_DOMAIN "nwfc.wiinoma.com" // Points to localhost
+#    define WWFC_DOMAIN "zplwii.xyz" // Points to localhost
 #  endif
 
 #endif
