@@ -284,6 +284,10 @@ static bool IsMatchHeaderPacketDataValid(
         }
     }
 
+    if (!NetController::Instance()->inVanillaRaceScene()) {
+        return true;
+    }
+
     MatchHeaderHandler::Packet::Course currentCourse =
         matchHeaderPacket->course;
     if (currentCourse != MatchHeaderHandler::Packet::Course::None) {
@@ -515,7 +519,7 @@ static bool IsEventPacketDataValid(
     // Always ensure that the packet does not contain any invalid item
     // objects, as this can cause a buffer overflow to occur.
     if (eventPacket->containsInvalidItemObject()) {
-        return true;
+        return false;
     }
 
     if (!NetController::Instance()->inVanillaMatch()) {
@@ -523,7 +527,7 @@ static bool IsEventPacketDataValid(
     }
 
     if (!eventPacket->isValid(packetSize)) {
-        return true;
+        return false;
     }
 
     return true;
