@@ -44,3 +44,4 @@ launcher/build
 *.wad
 *.app
 
+include/wwfcPayloadPublicKey.hpp

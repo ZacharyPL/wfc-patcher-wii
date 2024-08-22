@@ -252,10 +252,6 @@ static bool IsMatchHeaderPacketDataValid(
     const MatchHeaderHandler::Packet* matchHeaderPacket =
         reinterpret_cast<const MatchHeaderHandler::Packet*>(packet);
 
-    if (!NetController::Instance()->inVanillaRaceScene()) {
-        return true;
-    }
-
     RaceConfig::Scenario* scenario = &RaceConfig::Instance()->raceScenario();
 
     for (size_t n = 0;
