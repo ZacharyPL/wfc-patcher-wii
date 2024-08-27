@@ -42,6 +42,10 @@ LONGCALL bool SCGetProductSN( //
     u32* serial
 ) AT(ADDRESS_SCGetProductSN);
 
+LONGCALL u8 SCGetLanguage( //
+    void
+) AT(RMCXD_PORT(0x801B1D0C, 0x801B1C6C, 0x801B1C2C, 0x801B2068));
+
 #ifdef __cplusplus
 }
 }

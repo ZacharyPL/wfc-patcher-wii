@@ -5,6 +5,7 @@
 #include "import/mkw/system/system.hpp"
 #include "import/mkw/ui/multiMenuInputManager.hpp"
 #include "import/mkw/ui/section/sectionManager.hpp"
+#include "import/revolution.h"
 #include "messagePopupPage.hpp"
 #include "yesNoPopupPage.hpp"
 
@@ -82,6 +83,7 @@ private:
     void transition(State state)
     {
         Section* section = SectionManager::Instance()->currentSection();
+        u8 language = RVL::SCGetLanguage();
 
         if (state == s_state) {
             return;
@@ -93,12 +95,25 @@ private:
         }
         case State::Prompt: {
             FormatParam formatParam{};
-            formatParam.strings[0] =
-                L"Enable Open Host?\n\n"
-                L"This feature allows players who\n"
-                L"add your friend code to meet up with you,\n"
-                L"even if you don't add them back.";
-
+	    if (language == 0) {
+                formatParam.strings[0] =
+                   L"こうかいホストをゆうこうにしますか？\n\n"
+                   L"この機能はあなたのフレンドコードを\n"
+                   L"追加したプレイヤーはあなたが追加し返さなくても\n"
+                   L"フレンドとしてあなたと会えるようになる機能です";
+	    } else if (language == 3) {
+                formatParam.strings[0] =
+                    L"Activer l'Open Host?\n\n"
+                    L"Cette fonctionnalité permet aux joueurs qui\n"
+                    L"ajoutent votre code ami de vous rejoindre,\n"
+                    L"même si vous ne les avez pas ajoutés.";
+	    } else {
+                formatParam.strings[0] =
+                    L"Enable Open Host?\n\n"
+                    L"This feature allows players who\n"
+                    L"add your friend code to meet up with you,\n"
+                    L"even if you don't add them back.";
+	    }
             YesNoPopupPage* yesNoPopupPage =
                 section->page<YesNoPopupPage>(PageId::YesNoPopup);
             yesNoPopupPage->reset();
@@ -117,14 +132,35 @@ private:
         case State::Result: {
             FormatParam formatParam{};
             if (!s_sentOpenHostValue) {
-                formatParam.strings[0] = L"You have lost connection to\n"
-                                         L"the server.\n\n"
-                                         L"Please try again later.";
+                if (language == 0) {
+                    formatParam.strings[0] = L"サーバーからの接続が切断されました\n\n\n"
+                                             L"もう一度やり直してください";
+		} else if (language == 3) {
+                    formatParam.strings[0] = L"Vous avez perdu la connexion\n"
+                                             L"au serveur.\n\n"
+                                             L"Veuillez réessayer ultérieurement.";
+		} else {
+                    formatParam.strings[0] = L"You have lost connection to\n"
+                                             L"the server.\n\n"
+                                             L"Please try again later.";
+		}
             } else {
                 if (s_openHostEnabled) {
-                    formatParam.strings[0] = L"Open Host is now enabled!";
+                    if (language == 0) {
+                        formatParam.strings[0] = L"こうかいホストをゆうこうにしました！";
+		    } else if (language == 3) {
+                        formatParam.strings[0] = L"L'Open Host est maintenant activé!";
+		    } else {
+                        formatParam.strings[0] = L"Open Host is now enabled!";
+		    }
                 } else {
-                    formatParam.strings[0] = L"Open Host is now disabled!";
+                    if (language == 0) {
+                        formatParam.strings[0] = L"こうかいホストをむこうにしました！";
+		    } else if (language == 3) {
+                        formatParam.strings[0] = L"L'Open Host est maintenant désactivé!";
+		    } else {
+                        formatParam.strings[0] = L"Open Host is now disabled!";
+		    }
                 }
             }
 
