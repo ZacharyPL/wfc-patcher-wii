@@ -281,25 +281,6 @@ static bool IsMatchHeaderPacketDataValid(
         }
     }
 
-    if (!NetController::Instance()->inVanillaRaceScene()) {
-        return true;
-    }
-
-    MatchHeaderHandler::Packet::Course currentCourse =
-        matchHeaderPacket->course;
-    if (currentCourse != MatchHeaderHandler::Packet::Course::None) {
-        Course course = static_cast<Course>(currentCourse);
-        if (scenario->isOnlineVersusRace()) {
-            if (!IsRaceCourse(course)) {
-                return false;
-            }
-        } else /* if (scenario->isOnlineBattle()) */ {
-            if (!IsBattleCourse(course)) {
-                return false;
-            }
-        }
-    }
-
     return true;
 }
 
