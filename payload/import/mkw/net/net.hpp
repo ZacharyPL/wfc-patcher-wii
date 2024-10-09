@@ -147,7 +147,7 @@ public:
         case JoinType::WorldwideBattle:
         case JoinType::FriendWorldwideVersusRace:
         case JoinType::FriendWorldwideBattle: {
-            return true;
+            return false;
         }
         case JoinType::ContinentalVersusRace:
         case JoinType::ContinentalBattle:
