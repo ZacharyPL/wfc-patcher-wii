@@ -35,6 +35,8 @@ typedef struct wwfc_payload_info_ex wwfc_payload_info_ex_t;
 typedef struct wwfc_payload wwfc_payload_t;
 typedef struct wwfc_payload_ex wwfc_payload_ex_t;
 typedef struct wwfc_patch wwfc_patch_t;
+typedef struct wwfc_static_consumer_info wwfc_static_consumer_info_t;
+typedef struct wwfc_static_consumer_info_ex wwfc_static_consumer_info_ex_t;
 
 typedef wwfc_uint8_t wwfc_patch_type_t;
 typedef wwfc_uint8_t wwfc_patch_level_t;
@@ -74,6 +76,7 @@ struct wwfc_payload_info {
     wwfc_uint32_t function_exec;
     wwfc_uint32_t must_be_zero[0x14 / 4];
     wwfc_uint8_t build_timestamp[0x20];
+    wwfc_uint32_t static_consumer_info;
 };
 
 struct wwfc_payload_info_ex {
@@ -93,6 +96,25 @@ struct wwfc_payload_info_ex {
     wwfc_function_exec_t function_exec;
     wwfc_uint32_t must_be_zero[0x14 / 4];
     wwfc_uint8_t build_timestamp[0x20];
+    const wwfc_static_consumer_info_ex_t* static_consumer_info;
+};
+
+/**
+ * Optional metadata for consumers that apply the payload patch list ahead of
+ * time. All pointer-like fields are payload-relative offsets in the binary.
+ */
+struct wwfc_static_consumer_info {
+    wwfc_uint32_t format_version;
+    wwfc_uint32_t patch_free_entry_point;
+    wwfc_uint32_t ctors_end;
+    wwfc_uint32_t executable_end;
+};
+
+struct wwfc_static_consumer_info_ex {
+    wwfc_uint32_t format_version;
+    wwfc_payload_entry_t patch_free_entry_point;
+    const wwfc_uint32_t* ctors_end;
+    const wwfc_uint8_t* executable_end;
 };
 
 struct wwfc_payload {
