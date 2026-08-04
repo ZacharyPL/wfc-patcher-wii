@@ -72,6 +72,10 @@ WWFC_DEFINE_PATCH = Patch::Call( //
                         DWC::DWCiNodeInfo node = nodes[k];
                         char *nodeIpStr = SOINetNToA(&node.ipAddr);
 
+                        // Skip checking against empty nodes
+                        if (node.profileId == 0 && node.ipAddr == 0)
+                            continue;
+
                         WWFC_LOG_INFO_FMT("QR2: Testing against PID %d, IP %s : %d", node.profileId, nodeIpStr, node.ipAddr);
 
                         // If either matches, then we kick. Otherwise skip iter
