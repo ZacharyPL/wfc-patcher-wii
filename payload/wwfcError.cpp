@@ -4,7 +4,6 @@
 #include "wwfcLibC.hpp"
 #include "wwfcPatch.hpp"
 
-
 namespace wwfc::Error
 {
 
@@ -31,7 +30,10 @@ WWFC_DEFINE_PATCH = Patch::CallWithCTR(
 
 static int s_wwfcErrorCode = 0;
 #if RMC
-static wchar_t s_wwfcErrorMsg[256] = {};
+static wchar_t s_wwfcErrorMsg[256];
+static wchar_t s_wwfcErrorMsgDefault[] =
+    L"Failed to decode error message:\nError message too long.\nPlease open a "
+    L"ticket";
 #endif
 
 void HandleWWFCErrorMessage(
@@ -76,6 +78,9 @@ void HandleWWFCErrorMessage(
     );
     if (errorMessageLength == -1 ||
         errorMessageLength == sizeof(s_wwfcErrorMsg)) {
+        std::memcpy(
+            s_wwfcErrorMsg, s_wwfcErrorMsgDefault, sizeof(s_wwfcErrorMsgDefault)
+        );
         return;
     }
     s_wwfcErrorMsg[errorMessageLength / sizeof(wchar_t)] = L'\0';
