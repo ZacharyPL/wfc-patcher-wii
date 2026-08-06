@@ -43,7 +43,7 @@ void HandleWWFCErrorMessage(
         const char* str
     ) AT(ADDRESS_atoi);
 
-    char value[512];
+    char value[1024];
     int error = 0;
     if (GameSpy::gpiValueForKey(
             command, "\\wl:err\\", value, sizeof(value) - 1
