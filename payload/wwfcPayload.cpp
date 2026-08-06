@@ -26,6 +26,11 @@ s32 Entry(wwfc_payload* payload) asm("wwfc_payload_entry");
  */
 s32 EntryAfterGOT(wwfc_payload* payload) asm("wwfc_payload_entry_no_got");
 
+/**
+ * Payload entry point for consumers that already applied the patch list.
+ */
+s32 StaticEntry(wwfc_payload* payload) asm("wwfc_static_payload_entry");
+
 s32 FunctionExec(wwfc_function_t function, ...) asm("wwfc_function_exec");
 
 // Symbols provided in the linker script
@@ -37,7 +42,16 @@ extern wwfc_patch PatchStart asm("_G_WWFCPatchStart");
 extern wwfc_patch PatchEnd asm("_G_WWFCPatchEnd");
 extern u32 CTORSStart asm("__CTORS_START__");
 extern u32 CTORSEnd asm("__CTORS_END__");
+extern u8 ExecutableEnd asm("_G_ExecutableEnd");
 extern u8 PayloadEnd asm("_G_End");
+
+[[gnu::section(".wwfc_static_consumer_info")]]
+constinit const wwfc_static_consumer_info_ex StaticConsumerInfo = {
+    .format_version = 1,
+    .patch_free_entry_point = &StaticEntry,
+    .ctors_end = &CTORSEnd,
+    .executable_end = &ExecutableEnd,
+};
 
 [[gnu::section("wwfc_header")]]
 constinit const wwfc_payload_ex Header = {
@@ -50,7 +64,7 @@ constinit const wwfc_payload_ex Header = {
         },
     .salt = {},
     .info = {
-        .format_version = 2,
+        .format_version = 3,
         .format_version_compat = 1,
         .name = WWFC_PAYLOAD_NAME,
         .version = (WWFC_PAYLOAD_MAJOR << 24) | (WWFC_PAYLOAD_MINOR << 12) |
@@ -66,6 +80,7 @@ constinit const wwfc_payload_ex Header = {
         .function_exec = &FunctionExec,
         .must_be_zero = {},
         .build_timestamp = __TIMESTAMP__,
+        .static_consumer_info = &StaticConsumerInfo,
     },
 };
 
@@ -132,7 +147,7 @@ static void CallCtors(const wwfc_payload* const payload)
  * Payload entry point. Does not apply global offset table and fixup
  * relocations. Automatically called by wwfc_payload_entry.
  */
-s32 EntryAfterGOT(wwfc_payload* payload)
+static s32 InitializePayload(wwfc_payload* payload, const bool applyPatchList)
 {
 #if WWFC_TITLE_TYPE == WWFC_TITLE_TYPE_DISC
     // Verify that the current game is the one this payload is built for
@@ -171,15 +186,27 @@ s32 EntryAfterGOT(wwfc_payload* payload)
 
     CallCtors(payload);
 
-    Patch::ApplyPatchList(
-        reinterpret_cast<u32>(payload), &PatchStart,
-        std::distance(&PatchStart, &PatchEnd)
-    );
+    if (applyPatchList) {
+        Patch::ApplyPatchList(
+            reinterpret_cast<u32>(payload), &PatchStart,
+            std::distance(&PatchStart, &PatchEnd)
+        );
+    }
 
     Support::ChangeAuthURL();
     Login::Init();
 
     return WL_ERROR_PAYLOAD_OK;
+}
+
+s32 EntryAfterGOT(wwfc_payload* payload)
+{
+    return InitializePayload(payload, true);
+}
+
+s32 StaticEntry(wwfc_payload* payload)
+{
+    return InitializePayload(payload, false);
 }
 
 s32 FunctionExec(wwfc_function_t function, ...)

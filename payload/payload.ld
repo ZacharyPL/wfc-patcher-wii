@@ -11,6 +11,7 @@ SECTIONS
 {
 	.text : {
 		KEEP (*(wwfc_header))
+		KEEP (*(.wwfc_static_consumer_info))
 
 		. = ALIGN(4);
 		_G_GOTStart = .;
@@ -34,6 +35,7 @@ SECTIONS
 
 		*(.text*)
 		*(.insert*)
+		_G_ExecutableEnd = .;
 		*(.rodata*)
 		*(.data*)
 
