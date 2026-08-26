@@ -378,6 +378,8 @@ def parse_file(file_path, title_name):
     else:
         print('not found ' + title_name)
 
+    # print(f'{title_name}: {version} {response}')
+
     d = real_to_dol(hdr, ADDRESS_AUTH_HANDLERESP_HOOK)
     AUTH_HANDLERESP_UNPATCH = struct.unpack('>I', dol[d:d+4])[0]
 
@@ -421,7 +423,7 @@ def parse_file(file_path, title_name):
     if index == -1:
         print('missing DWCi_HandleGPError :( ' + title_name)
 
-        
+
 
     if version == 'A':
         addrOf = real_to_dol(hdr, ADDRESS_DWCi_Auth_SendRequest)
@@ -634,7 +636,7 @@ def parse_file(file_path, title_name):
 
     if index == -1:
         exit("NHTTPStartup not found " + title_name)
-        
+
 
     ADDRESS_gethostbyname = 0
     ADDRESS_SKIP_DNS_CACHE = 0
@@ -1159,6 +1161,20 @@ def parse_file(file_path, title_name):
         assert(dol[index-0x8C:index-0x88] == b'\x94\x21\xFF\xE0')
         ADDRESS_DWCi_GetGPBuddyAdditionalMsg = dol_to_real(hdr, index-0x8C)
 
+    ADDRESS_DWCi_GPRecvBuddyMessageCallback = 0
+    index = dol.find(b'\x7f\xde\x1a\x14\x38\x80\x00\x76\x7f\xc3\xf3\x78')
+    if index != -1:
+        assert(dol[index+0x18:index+0x1C] == b'\x7F\xA5\xEB\x78')
+        if dol[index-0x78:index-0x74] == b'\x94\x21\xFF\xD0':
+            ADDRESS_DWCi_GPRecvBuddyMessageCallback = dol_to_real(hdr, index-0x78)
+        elif dol[index-0x84:index-0x80] == b'\x94\x21\xFF\xD0':
+            ADDRESS_DWCi_GPRecvBuddyMessageCallback = dol_to_real(hdr, index-0x84)
+        else:
+            exit("UNKNOWN DWCi_GPRecvBuddyMessageCallback " + title_name)
+        ADDRESS_PATCH_SECURITY_GPRECVBUDDYMESSAGE = dol_to_real(hdr, index+0x18)
+    else:
+        print("NOT FOUND IN " + title_name)
+
     # find OSInitSystemCall
     index = dol.find(b'\x7C\x00\x04\xAC\x38\x7F\x0C\x00\x38\x80\x01\x00')
     if index == -1:
@@ -1347,7 +1363,7 @@ def parse_file(file_path, title_name):
     else:
         if match.group(1) == b'\x80\xBF\x00\x14\x80\xDF\x00\x18':
             GT2_PORT_PATCH_REG = 31
-            
+
         elif match.group(1) == b'\x80\xBE\x00\x14\x80\xDE\x00\x18':
             GT2_PORT_PATCH_REG = 30
 
@@ -1376,7 +1392,7 @@ def parse_file(file_path, title_name):
                 offset -= 0x10000
             ADDRESS_ESP_FD = ADDRESS_R13_BASE + offset
 
-    
+
     # find gpiCheckForError (MKW PAL: 0x80108f64)
     TYPE_gpiCheckForError = 0
     index = dol.find(b'\x7c\x03\x00\xd0\x38\x80\x00\x04\x7c\x00\x1b\x78\x7f\x83\xe3\x78\x54\x05\x0f\xfe')
@@ -1411,7 +1427,7 @@ def parse_file(file_path, title_name):
     if index == -1:
         exit('No Find DWCi_HandleGPError ' + title_name)
 
-    print(title_name)
+    # print(title_name)
     assert(dol[index+0x34:index+0x38] == b'\x4e\x80\x00\x20')
 
     ADDRESS_PATCH_DWCi_HandleGPError = dol_to_real(hdr, index + 0x28)
@@ -1499,6 +1515,8 @@ def parse_file(file_path, title_name):
         "ADDRESS_DWC_Base64Encode":          fmthex(ADDRESS_DWC_Base64Encode),
         "ADDRESS_DWCi_GetUserData":          fmthex(ADDRESS_DWCi_GetUserData),
         "ADDRESS_DWCi_GetGPBuddyAdditionalMsg": fmthex(ADDRESS_DWCi_GetGPBuddyAdditionalMsg),
+        "ADDRESS_DWCi_GPRecvBuddyMessageCallback": fmthex(ADDRESS_DWCi_GPRecvBuddyMessageCallback),
+        "ADDRESS_PATCH_SECURITY_GPRECVBUDDYMESSAGE": fmthex(ADDRESS_PATCH_SECURITY_GPRECVBUDDYMESSAGE),
         "ADDRESS_RealMode":                  fmthex(ADDRESS_RealMode),
         "ADDRESS_OSInitSystemCall_Tail":     fmthex(ADDRESS_OSInitSystemCall_Tail),
         "ADDRESS_GTI2_BUFFER":               fmthex(ADDRESS_GTI2_BUFFER),
@@ -1611,6 +1629,8 @@ if __name__ == '__main__':
         "ADDRESS_DWC_Base64Encode",
         "ADDRESS_DWCi_GetUserData",
         "ADDRESS_DWCi_GetGPBuddyAdditionalMsg",
+        "ADDRESS_DWCi_GPRecvBuddyMessageCallback",
+        "ADDRESS_PATCH_SECURITY_GPRECVBUDDYMESSAGE",
         "ADDRESS_RealMode",
         "ADDRESS_OSInitSystemCall_Tail",
         "ADDRESS_GTI2_BUFFER",

@@ -15,21 +15,34 @@ WWFC_DEFINE_PATCH = Patch::CallWithCTR(
     ASM_LAMBDA(
         (),
         // clang-format off
-            cmplwi    r31, 0xF; // The destination buffer is of size 0x10; leave room for the null terminator
-            mflr      r9;
-            mr        r5, r31;
-            mr        r4, r28;
-            mr        r3, r27;
-            ble+      L_ValidLength;
+        // The destination buffer is of size 0x10; leave room for the null terminator
+        cmplwi    r31, 0xF;
+        mflr      r9;
+        mr        r5, r31;
+        mr        r4, r28;
+        mr        r3, r27;
+        ble+      L_ValidLength;
 
-            addi      r9, r9, -0x1C; // return -1
-            mtctr     r9;
-            bctr;
+        addi      r9, r9, -0x1C; // return -1
+        mtctr     r9;
+        bctr;
 
-        L_ValidLength:
-            b         memcpy;
+    L_ValidLength:
+        b         memcpy;
         // clang-format on
     )
+);
+#endif
+
+#if ADDRESS_PATCH_SECURITY_GPRECVBUDDYMESSAGE
+// SERVER TO CLIENT VULNERABILITY
+// Stack overflow of char[12]. This patch limits the length allowed by strncpy
+// to 7. The largest length ever required in normal use is 2 (encoding the
+// string "90").
+WWFC_DEFINE_PATCH = Patch::WriteASM(
+    WWFC_PATCH_LEVEL_CRITICAL, //
+    ADDRESS_PATCH_SECURITY_GPRECVBUDDYMESSAGE, // 0x800D36D8
+    1, ASM_LAMBDA((), rlwinm r5, r29, 0, 29, 31)
 );
 #endif
 
@@ -45,20 +58,20 @@ WWFC_DEFINE_PATCH = Patch::CallWithCTR(
     ASM_LAMBDA(
         (),
         // clang-format off
-            lbz     r5, 0x11(r1);
-            addi    r0, r5, 0x14;
-            cmplw   r31, r0;
-            bnelr-; // Error "Got wrong data size GT2 command."
+        lbz     r5, 0x11(r1);
+        addi    r0, r5, 0x14;
+        cmplw   r31, r0;
+        bnelr-; // Error "Got wrong data size GT2 command."
 
-            // Check the maximum length to prevent a buffer overflow
-            cmplwi  r5, 0x80;
-            bgtlr-; // Error "Got wrong data size GT2 command."
+        // Check the maximum length to prevent a buffer overflow
+        cmplwi  r5, 0x80;
+        bgtlr-; // Error "Got wrong data size GT2 command."
 
-            // OK, jump to the copy routine
-            mflr    r12;
-            addi    r12, r12, 0x14;
-            mtctr   r12;
-            bctr;
+        // OK, jump to the copy routine
+        mflr    r12;
+        addi    r12, r12, 0x14;
+        mtctr   r12;
+        bctr;
         // clang-format on
     )
 );
@@ -73,23 +86,23 @@ WWFC_DEFINE_PATCH = Patch::CallWithCTR(
     ASM_LAMBDA(
         (),
         // clang-format off
-            lbz     r5, 0x11(r1);
-            // Check the maximum length to prevent a buffer overflow
-            cmplwi  r5, 0x80;
-            bgt-    L%=SBCommandError;
+        lbz     r5, 0x11(r1);
+        // Check the maximum length to prevent a buffer overflow
+        cmplwi  r5, 0x80;
+        bgt-    L%=SBCommandError;
 
-            // OK, copy the data to the stack
-            addi    r3, r1, 0x1C;
-            addi    r4, r28, 0x14;
-            // Call and return
-            b       memcpy@local;
+        // OK, copy the data to the stack
+        addi    r3, r1, 0x1C;
+        addi    r4, r28, 0x14;
+        // Call and return
+        b       memcpy@local;
 
-        L%=SBCommandError:;
-            // Jump to "Got different version SBcommand." error
-            mflr    r12;
-            subi    r12, r12, 0x24;
-            mtctr   r12;
-            bctr;
+    L%=SBCommandError:;
+        // Jump to "Got different version SBcommand." error
+        mflr    r12;
+        subi    r12, r12, 0x24;
+        mtctr   r12;
+        bctr;
         // clang-format on
     )
 );
